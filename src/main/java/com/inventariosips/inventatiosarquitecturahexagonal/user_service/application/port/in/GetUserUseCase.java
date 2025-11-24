@@ -2,6 +2,6 @@ package com.inventariosips.inventatiosarquitecturahexagonal.user_service.applica
 
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.model.User;
 
-public interface UpdateUserUseCase {
-    User updateUser(User user, Integer idUser);
+public interface GetUserUseCase {
+    User updateUser(User user, Long idUser);
 }
