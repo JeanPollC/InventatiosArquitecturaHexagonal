@@ -26,9 +26,5 @@ public class UserExeptionHandler {
         return errors;
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiError
-
 
 }
