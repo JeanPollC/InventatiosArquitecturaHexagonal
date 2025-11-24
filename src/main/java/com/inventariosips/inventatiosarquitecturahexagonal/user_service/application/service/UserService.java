@@ -8,6 +8,7 @@ import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.e
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.exception.UserException;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.exception.UserNotFoundException;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.model.User;
+import com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.controller.dto.request.UserUpdateDTO;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.persistance.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,7 +48,7 @@ public class UserService implements CreateUserUseCase, GetUserUseCase, UpdateUse
             throw new UserException(UserErrorMessage.USER_LASTNAME_NOT_NULL);
         }
 
-        if (user.lastName().isEmpty()){
+        if (user.lastName().trim().isEmpty()){
             throw new UserException(UserErrorMessage.USER_LASTNAME_NOT_EMPTY);
         }
 
@@ -67,9 +68,46 @@ public class UserService implements CreateUserUseCase, GetUserUseCase, UpdateUse
     }
 
     @Override
-    public User updateUser(User user, Long idUser) {
-        User userUpdated =  userRepositoryPort.getUserById(idUser)
+    public User updateUser(UserUpdateDTO user, Long idUser) {
+        User existingUser =  userRepositoryPort.getUserById(idUser)
                 .orElseThrow(() -> new UserNotFoundException(UserErrorMessage.USER_DOES_NOT_EXISTS));
+
+        user.name().ifPresent(name -> {
+            if (name.trim().isEmpty()) {
+                throw new UserException(UserErrorMessage.USER_NAME_NOT_EMPTY);
+            }
+        });
+
+        user.lastName().ifPresent(lastName -> {
+            if (lastName.trim().isEmpty()) {
+                throw new UserException(UserErrorMessage.USER_LASTNAME_NOT_EMPTY);
+            }
+        });
+
+        user.email().ifPresent(email -> {
+            if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+                throw new UserException(UserErrorMessage.USER_EMAIL_INVALID);
+            }
+
+            if (!existingUser.email().equals(email) && userRepositoryPort.existsByEmail(email)){
+                throw new UserException(UserErrorMessage.USER_EMAIL_ALREADY_EXISTS);
+            }
+        });
+
+        user.status().ifPresent(status -> {
+            if (status.trim().isEmpty()){
+                throw new UserException(UserErrorMessage.USER_STATUS_NOT_EMPTY);
+            }
+        });
+
+        User userUpdated = new User(
+                existingUser.idUser(),
+                user.name().orElse(existingUser.name()),
+                user.lastName().orElse(existingUser.lastName()),
+                user.email().orElse(existingUser.email()),
+                existingUser.userTypeId(),
+                user.status().orElse(existingUser.status())
+        );
 
         return userRepositoryPort.updateUser(userUpdated);
     }

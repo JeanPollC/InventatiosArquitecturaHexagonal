@@ -4,6 +4,6 @@ public record UserResponseDTO(
         String name,
         String lastName,
         String email,
-        Long UserTypeId,
+        Long userTypeId,
         String status
 ) { }

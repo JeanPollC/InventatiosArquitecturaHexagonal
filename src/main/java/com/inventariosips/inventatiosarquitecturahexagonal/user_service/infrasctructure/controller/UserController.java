@@ -5,6 +5,7 @@ import com.inventariosips.inventatiosarquitecturahexagonal.user_service.applicat
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.port.in.UpdateUserUseCase;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.model.User;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.controller.dto.request.UserRequestDTO;
+import com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.controller.dto.request.UserUpdateDTO;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.controller.dto.response.UserResponseDTO;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.mapper.IUserMapper;
 import jakarta.validation.Valid;
@@ -49,15 +50,13 @@ public class UserController {
                 .body(mapperUser.UserToUserResponseDTO(savedUser));
     }
 
+    @PutMapping("{id}")
+    public ResponseEntity<UserResponseDTO> updateUser(@Valid @RequestBody UserUpdateDTO userDTO, @PathVariable("id") Long id) {
+        User user = updateUserUseCase.updateUser(userDTO, id);
+        return ResponseEntity.ok(mapperUser.UserToUserResponseDTO(user));
+    }
 
     /*
-    @PutMapping("{id}")
-    public ResponseEntity<UserResponseDTO> updateUser(@Valid @RequestBody UserRequestDTO userDTO, @PathVariable("id") Long id) {
-        User user = updateUserUseCase.updateUser(mapperUser.UserRequestDTOToUserEntity(userDTO), id);
-        UserResponseDTO userUpdated = mapperUser.UserToUserResponseDTO(user);
-
-        return ResponseEntity.ok(userUpdated);
-    }
 
     @GetMapping("/pageable")
     public ResponseEntity<Page<UserResponseDTO>> findAllUsersPageable(

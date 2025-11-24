@@ -1,6 +1,8 @@
 package com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.persistance;
 
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.port.out.UserRepositoryPort;
+import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.exception.UserErrorMessage;
+import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.exception.UserNotFoundException;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.model.User;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.mapper.IUserMapper;
 import lombok.RequiredArgsConstructor;
@@ -35,12 +37,17 @@ public class JpaUserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     public User updateUser(User user) {
-        UserEntity userEntity = userMapper.UserToUserEntity(user);
-        userEntity.setName(user.name());
-        userEntity.setLastName(user.lastName());
-        userEntity.setEmail(user.email());
-        userEntity.setStatus(user.status());
-        return userMapper.UserEntityToUser(repository.save(userEntity));
+        UserEntity userExisisting = repository.findById(user.idUser())
+                .orElseThrow(() -> new UserNotFoundException(UserErrorMessage.USER_DOES_NOT_EXISTS));
+
+        userExisisting.setName(user.name());
+        userExisisting.setLastName(user.lastName());
+        userExisisting.setEmail(user.email());
+        userExisisting.setStatus(user.status());
+
+        UserEntity userUpdate = repository.save(userExisisting);
+
+        return userMapper.UserEntityToUser(userUpdate);
     }
 
     @Override

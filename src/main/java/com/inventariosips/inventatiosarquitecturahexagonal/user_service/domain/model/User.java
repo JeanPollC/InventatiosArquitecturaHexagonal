@@ -1,7 +1,7 @@
 package com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.model;
 
 public record User(
-        Long id,
+        Long idUser,
         String name,
         String lastName,
         String email,
