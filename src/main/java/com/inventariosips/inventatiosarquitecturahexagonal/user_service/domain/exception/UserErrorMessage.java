@@ -13,5 +13,7 @@ public class UserErrorMessage {
 
     public static final String USERTYPE_NOT_NULL = "El tipo de usuario no puede venir nulo";
 
+    public static final String USER_DOES_NOT_EXISTS = "El usuario no existe";
+
     private  UserErrorMessage(){}
 }

@@ -1,6 +1,7 @@
 package com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.controller;
 
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.port.in.CreateUserUseCase;
+import com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.port.in.GetUserUseCase;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.model.User;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.controller.dto.request.UserRequestDTO;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.controller.dto.response.UserResponseDTO;
@@ -11,13 +12,31 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
 
     private final CreateUserUseCase createUserUseCase;
+    private final GetUserUseCase getUserUseCase;
     private final IUserMapper mapperUser;
+
+    @GetMapping
+    public ResponseEntity<List<UserResponseDTO>> findAllUsers() {
+        List<UserResponseDTO> lst = mapperUser.lstUserToLstUserResponseDTO(
+                getUserUseCase.getAllUsers());
+        return ResponseEntity.ok(lst);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable("id") Long idUser){
+        UserResponseDTO responseDTO = mapperUser.UserToUserResponseDTO(
+            getUserUseCase.getUserById(idUser));
+
+        return ResponseEntity.ok(responseDTO);
+    }
 
     @PostMapping
     public ResponseEntity<UserResponseDTO> saveUser(@Valid @RequestBody UserRequestDTO userDTO) {
@@ -27,13 +46,9 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(mapperUser.UserToUserResponseDTO(savedUser));
     }
+    /*
 
 
-    /*@GetMapping
-    public ResponseEntity<List<UserResponseDTO>> findAllUsers() throws Exception {
-        List<UserEntity> lst = userService.findAllUser().stream().toList();
-        return ResponseEntity.ok(mapperUser.lstUserEntityToLstUserResponseDTO(lst));
-    }
 
     @GetMapping("/pageable")
     public ResponseEntity<Page<UserResponseDTO>> findAllUsersPageable(

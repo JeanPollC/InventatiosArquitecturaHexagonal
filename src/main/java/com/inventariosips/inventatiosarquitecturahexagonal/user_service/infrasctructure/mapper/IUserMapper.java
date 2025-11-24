@@ -18,9 +18,10 @@ public interface IUserMapper {
     UserResponseDTO UserToUserResponseDTO(User user);
 
     //RESPONSE
-    UserResponseDTO UserEntityToUserResponseDTO(UserEntity userEntity);
+    UserResponseDTO UserToUserResponseDTO(UserEntity userEntity);
 
-    List<UserResponseDTO> lstUserEntityToLstUserResponseDTO(List<UserEntity> usersListEntity);
+    List<UserResponseDTO> lstUserToLstUserResponseDTO(List<User> ListUsers);
+    List<User> lstUserEntityToLstUser(List<UserEntity> usersListEntity);
 
 
 

@@ -1,4 +1,5 @@
 package com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.controller.dto.response;
 
-public class UserErrorResponse {
-}
+public record UserErrorResponse(
+    String message
+) {}

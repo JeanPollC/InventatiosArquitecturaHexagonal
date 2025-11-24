@@ -1,29 +1,39 @@
 package com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.controller.exception;
 
-import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.exception.UserErrorMessage;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.exception.UserException;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.exception.UserNotFoundException;
+import com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.controller.dto.response.UserErrorResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestControllerAdvice
 public class UserExeptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
+    public UserErrorResponse handleValidationExceptions(MethodArgumentNotValidException ex) {
+        String errors = ex.getBindingResult()
+                .getAllErrors()
+                .stream()
+                .map(error -> ((FieldError) error).getField() + ": " + error.getDefaultMessage())
+                .toList().toString();
+        return new UserErrorResponse(errors);
+    }
 
-        ex.getBindingResult().getFieldErrors()
-                .forEach(err -> errors.put(err.getField(), err.getDefaultMessage()));
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public UserErrorResponse handleUserNotFoundException(UserNotFoundException ex) {
+        return new UserErrorResponse(ex.getMessage());
+    }
 
-        return errors;
+    @ExceptionHandler(UserException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public UserErrorResponse handleUserException(UserException ex) {
+        return new UserErrorResponse(ex.getMessage());
     }
 
 
