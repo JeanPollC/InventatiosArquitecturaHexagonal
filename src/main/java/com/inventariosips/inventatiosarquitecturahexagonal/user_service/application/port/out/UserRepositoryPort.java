@@ -11,5 +11,6 @@ public interface UserRepositoryPort {
     List<User> getAllUsers();
     Optional<User> getUserById(Long idUser);
     User save(User user);
+    User updateUser(User user);
     boolean existsByEmail(String email);
 }

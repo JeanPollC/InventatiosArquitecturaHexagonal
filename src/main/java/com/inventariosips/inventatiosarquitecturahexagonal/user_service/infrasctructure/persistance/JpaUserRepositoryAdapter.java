@@ -34,6 +34,16 @@ public class JpaUserRepositoryAdapter implements UserRepositoryPort {
     }
 
     @Override
+    public User updateUser(User user) {
+        UserEntity userEntity = userMapper.UserToUserEntity(user);
+        userEntity.setName(user.name());
+        userEntity.setLastName(user.lastName());
+        userEntity.setEmail(user.email());
+        userEntity.setStatus(user.status());
+        return userMapper.UserEntityToUser(repository.save(userEntity));
+    }
+
+    @Override
     public boolean existsByEmail(String email) {
         return repository.existsByEmail(email);
     }

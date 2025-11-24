@@ -2,6 +2,7 @@ package com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasc
 
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.port.in.CreateUserUseCase;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.port.in.GetUserUseCase;
+import com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.port.in.UpdateUserUseCase;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.model.User;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.controller.dto.request.UserRequestDTO;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.controller.dto.response.UserResponseDTO;
@@ -21,6 +22,7 @@ public class UserController {
 
     private final CreateUserUseCase createUserUseCase;
     private final GetUserUseCase getUserUseCase;
+    private final UpdateUserUseCase updateUserUseCase;
     private final IUserMapper mapperUser;
 
     @GetMapping
@@ -46,9 +48,16 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(mapperUser.UserToUserResponseDTO(savedUser));
     }
+
+
     /*
+    @PutMapping("{id}")
+    public ResponseEntity<UserResponseDTO> updateUser(@Valid @RequestBody UserRequestDTO userDTO, @PathVariable("id") Long id) {
+        User user = updateUserUseCase.updateUser(mapperUser.UserRequestDTOToUserEntity(userDTO), id);
+        UserResponseDTO userUpdated = mapperUser.UserToUserResponseDTO(user);
 
-
+        return ResponseEntity.ok(userUpdated);
+    }
 
     @GetMapping("/pageable")
     public ResponseEntity<Page<UserResponseDTO>> findAllUsersPageable(
@@ -80,13 +89,7 @@ public class UserController {
     }*/
 
 
-    /*@PutMapping("{id}")
-    public ResponseEntity<UserEntity> updateUser(@Valid @RequestBody UserRequestDTO userDTO, @PathVariable("id") Integer id) throws Exception {
-        userDTO.setIdUser(id);
-        UserEntity userEntity = userService.updateUser(mapperUser.userDTOToUserEntity(userDTO), id);
-
-        return ResponseEntity.ok(userEntity);
-    }
+    /*
 
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable("id") Integer id) throws Exception {

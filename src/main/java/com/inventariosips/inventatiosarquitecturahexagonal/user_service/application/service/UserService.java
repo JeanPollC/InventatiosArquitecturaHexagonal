@@ -2,11 +2,13 @@ package com.inventariosips.inventatiosarquitecturahexagonal.user_service.applica
 
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.port.in.CreateUserUseCase;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.port.in.GetUserUseCase;
+import com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.port.in.UpdateUserUseCase;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.port.out.UserRepositoryPort;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.exception.UserErrorMessage;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.exception.UserException;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.exception.UserNotFoundException;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.model.User;
+import com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.persistance.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements CreateUserUseCase, GetUserUseCase {
+public class UserService implements CreateUserUseCase, GetUserUseCase, UpdateUserUseCase {
 
     private final UserRepositoryPort userRepositoryPort;
 
@@ -64,12 +66,15 @@ public class UserService implements CreateUserUseCase, GetUserUseCase {
         return userRepositoryPort.save(user);
     }
 
-/*
     @Override
-    public User updateUser(User user, Long id) {
-        userRepo.findById(id).orElseThrow(() -> new ModelNotFoundException("ID NOT FOUND: " + id));
-        return userRepo.save(userEntity);
+    public User updateUser(User user, Long idUser) {
+        User userUpdated =  userRepositoryPort.getUserById(idUser)
+                .orElseThrow(() -> new UserNotFoundException(UserErrorMessage.USER_DOES_NOT_EXISTS));
+
+        return userRepositoryPort.updateUser(userUpdated);
     }
+
+/*
 
 
     @Override
