@@ -6,9 +6,12 @@ import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.e
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.model.User;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.mapper.IUserMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Repository
@@ -21,6 +24,19 @@ public class JpaUserRepositoryAdapter implements UserRepositoryPort {
     @Override
     public List<User> getAllUsers() {
         return userMapper.lstUserEntityToLstUser(repository.findAll());
+    }
+
+    @Override
+    public Page<User> getAllUsers(Pageable pageable, String filter) {
+        Page<UserEntity> usersPage;
+
+        if (filter != null && filter.trim().isEmpty()){
+            usersPage = repository.findByGlobalFilter(pageable, filter.toLowerCase());
+        } else {
+            usersPage = repository.findAll(pageable);
+        }
+
+        return usersPage.map(userMapper::UserEntityToUser);
     }
 
     @Override
@@ -48,6 +64,11 @@ public class JpaUserRepositoryAdapter implements UserRepositoryPort {
         UserEntity userUpdate = repository.save(userExisisting);
 
         return userMapper.UserEntityToUser(userUpdate);
+    }
+
+    @Override
+    public void deleteUser(Long idUser) {
+        repository.deleteById(idUser);
     }
 
     @Override

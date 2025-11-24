@@ -1,6 +1,7 @@
 package com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.controller;
 
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.port.in.CreateUserUseCase;
+import com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.port.in.DeleteUserUseCase;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.port.in.GetUserUseCase;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.port.in.UpdateUserUseCase;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.model.User;
@@ -10,6 +11,9 @@ import com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasct
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.mapper.IUserMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +28,7 @@ public class UserController {
     private final CreateUserUseCase createUserUseCase;
     private final GetUserUseCase getUserUseCase;
     private final UpdateUserUseCase updateUserUseCase;
+    private final DeleteUserUseCase deleteUserUseCase;
     private final IUserMapper mapperUser;
 
     @GetMapping
@@ -31,6 +36,25 @@ public class UserController {
         List<UserResponseDTO> lst = mapperUser.lstUserToLstUserResponseDTO(
                 getUserUseCase.getAllUsers());
         return ResponseEntity.ok(lst);
+    }
+
+    @GetMapping("/pageable")
+    public ResponseEntity<Page<UserResponseDTO>> findAllUsersPageable(
+            Pageable pageable,
+            @RequestParam(name = "filter", required = false, defaultValue = "") String filter){
+        Page<User> users = getUserUseCase.findAllUsers(pageable, filter);
+
+        List<UserResponseDTO> dtoList = users.stream()
+                .map(mapperUser::UserToUserResponseDTO)
+                .toList();
+
+        Page<UserResponseDTO> dtoPage = new PageImpl<>(
+                dtoList,
+                pageable,
+                users.getTotalElements()
+        );
+
+        return ResponseEntity.ok(dtoPage);
     }
 
     @GetMapping("/{id}")
@@ -56,45 +80,9 @@ public class UserController {
         return ResponseEntity.ok(mapperUser.UserToUserResponseDTO(user));
     }
 
-    /*
-
-    @GetMapping("/pageable")
-    public ResponseEntity<Page<UserResponseDTO>> findAllUsersPageable(
-            Pageable pageable,
-            @RequestParam(name = "filter", required = false, defaultValue = "") String filter) throws Exception {
-        // 1. Obtener la página de entidades del servicio
-        Page<UserEntity> userPage = userService.findAllUser(pageable, filter);
-
-        // 2. Convertir la lista de entidades (content) a DTOs
-        List<UserResponseDTO> dtoList = userPage.getContent().stream()
-                .map(mapperUser::UserEntityToUserResponseDTO)
-                .collect(Collectors.toList());
-
-        // 3. Reconstruir la respuesta Page usando los metadatos de la página original
-        Page<UserResponseDTO> dtoPage = new PageImpl<>(
-                dtoList,
-                pageable,
-                userPage.getTotalElements()
-        );
-
-        return ResponseEntity.ok(dtoPage);
-    }
-
-    @GetMapping("{id}")
-    public ResponseEntity<UserResponseDTO> findByIdUser(@PathVariable("id") Integer id) throws Exception {
-        UserResponseDTO dto = mapperUser.UserEntityToUserResponseDTO(userService.findByIdUser(id));
-
-        return ResponseEntity.ok(dto);
-    }*/
-
-
-    /*
-
     @DeleteMapping("{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable("id") Integer id) throws Exception {
-        userService.deleteUser(id);
-
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long idUser) {
+        deleteUserUseCase.deleteUser(idUser);
         return ResponseEntity.noContent().build();
-    }*/
-
+    }
 }

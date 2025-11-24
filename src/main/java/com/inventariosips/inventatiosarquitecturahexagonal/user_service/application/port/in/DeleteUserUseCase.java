@@ -1,0 +1,5 @@
+package com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.port.in;
+
+public interface DeleteUserUseCase {
+    void deleteUser(Long idUser);
+}

@@ -1,6 +1,7 @@
 package com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.service;
 
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.port.in.CreateUserUseCase;
+import com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.port.in.DeleteUserUseCase;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.port.in.GetUserUseCase;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.port.in.UpdateUserUseCase;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.application.port.out.UserRepositoryPort;
@@ -9,8 +10,9 @@ import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.e
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.exception.UserNotFoundException;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.domain.model.User;
 import com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.controller.dto.request.UserUpdateDTO;
-import com.inventariosips.inventatiosarquitecturahexagonal.user_service.infrasctructure.persistance.UserEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,13 +20,18 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements CreateUserUseCase, GetUserUseCase, UpdateUserUseCase {
+public class UserService implements CreateUserUseCase, GetUserUseCase, UpdateUserUseCase, DeleteUserUseCase {
 
     private final UserRepositoryPort userRepositoryPort;
 
     @Override
     public List<User> getAllUsers() {
         return userRepositoryPort.getAllUsers();
+    }
+
+    @Override
+    public Page<User> findAllUsers(Pageable pageable, String filter) {
+        return userRepositoryPort.getAllUsers(pageable, filter);
     }
 
     @Override
@@ -112,22 +119,12 @@ public class UserService implements CreateUserUseCase, GetUserUseCase, UpdateUse
         return userRepositoryPort.updateUser(userUpdated);
     }
 
-/*
-
-
     @Override
-    public Page<UserEntity> findAllUser(Pageable pageable, String filter) {
-        if (filter != null && !filter.trim().isEmpty()) {
-            return userRepo.findByGlobalFilter(filter.toLowerCase(), pageable);
-        }
-        return userRepo.findAll(pageable);
+    public void deleteUser(Long idUser) {
+        userRepositoryPort.getUserById(idUser)
+                .orElseThrow(() -> new UserNotFoundException(UserErrorMessage.USER_DOES_NOT_EXISTS));
+
+        userRepositoryPort.deleteUser(idUser);
     }
-
-
-    @Override
-    public void deleteUser(Integer id) {
-        userRepo.findById(id).orElseThrow(() -> new ModelNotFoundException("ID NOT FOUND: " + id));
-        userRepo.deleteById(id);
-    }*/
 
 }
